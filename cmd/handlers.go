@@ -164,6 +164,14 @@ func initHandlers(g *fastglue.Fastglue, hub *ws.Hub) {
 	g.POST("/api/v1/contacts/{id}/notes", perm(handleCreateContactNote, "contact_notes:write"))
 	g.DELETE("/api/v1/contacts/{id}/notes/{note_id}", perm(handleDeleteContactNote, "contact_notes:delete"))
 
+	// Companies.
+	g.GET("/api/v1/companies/compact", perm(handleGetCompaniesCompact, "companies:read"))
+	g.GET("/api/v1/companies", perm(handleGetCompanies, "companies:read"))
+	g.GET("/api/v1/companies/{id}", perm(handleGetCompany, "companies:read"))
+	g.POST("/api/v1/companies", perm(handleCreateCompany, "companies:write"))
+	g.PUT("/api/v1/companies/{id}", perm(handleUpdateCompany, "companies:write"))
+	g.DELETE("/api/v1/companies/{id}", perm(handleDeleteCompany, "companies:delete"))
+
 	// Teams.
 	g.GET("/api/v1/teams/compact", auth(handleGetTeamsCompact))
 	g.GET("/api/v1/teams", perm(handleGetTeams, "teams:manage"))
