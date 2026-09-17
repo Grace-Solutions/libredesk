@@ -159,6 +159,31 @@ CREATE TABLE roles (
 	CONSTRAINT constraint_roles_on_description CHECK (length(description) <= 300)
 );
 
+DROP TABLE IF EXISTS companies CASCADE;
+CREATE TABLE companies (
+    id BIGSERIAL PRIMARY KEY,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+    -- A company may sit under another one, e.g. an MSP holding the contract for the companies it serves.
+    -- Deleting a parent promotes its children to roots rather than removing the subtree.
+    parent_id BIGINT NULL REFERENCES companies(id) ON DELETE SET NULL ON UPDATE CASCADE,
+    "name" TEXT NOT NULL,
+    description TEXT NULL,
+    website TEXT NULL,
+    phone_number_country_code TEXT NULL,
+    phone_number TEXT NULL,
+    country TEXT NULL,
+    CONSTRAINT constraint_companies_on_name CHECK (length("name") > 0 AND length("name") <= 140),
+    CONSTRAINT constraint_companies_on_description CHECK (length(description) <= 300),
+    CONSTRAINT constraint_companies_on_website CHECK (length(website) <= 300),
+    CONSTRAINT constraint_companies_on_phone_number CHECK (length(phone_number) <= 20),
+    CONSTRAINT constraint_companies_on_phone_number_country_code CHECK (length(phone_number_country_code) <= 10),
+    CONSTRAINT constraint_companies_on_country CHECK (length(country) <= 140),
+    CONSTRAINT constraint_companies_on_parent_id_not_self CHECK (parent_id IS NULL OR parent_id <> id)
+);
+CREATE UNIQUE INDEX index_unique_companies_on_name ON companies (lower("name"));
+CREATE INDEX index_companies_on_parent_id ON companies(parent_id);
+
 DROP TABLE IF EXISTS users CASCADE;
 CREATE TABLE users (
     id BIGSERIAL PRIMARY KEY,
@@ -177,6 +202,8 @@ CREATE TABLE users (
     avatar_url TEXT NULL,
 	custom_attributes JSONB DEFAULT '{}'::jsonb NOT NULL,
 	external_user_id TEXT NULL,
+	-- Contacts optionally belong to a company; unaffiliated contacts keep this NULL.
+	company_id BIGINT NULL REFERENCES companies(id) ON DELETE SET NULL ON UPDATE CASCADE,
     reset_password_token TEXT NULL,
     reset_password_token_expiry TIMESTAMPTZ NULL,
 	availability_status user_availability_status DEFAULT 'offline' NOT NULL,
@@ -195,6 +222,7 @@ CREATE TABLE users (
 );
 CREATE INDEX index_tgrm_users_on_email ON users USING GIN (email gin_trgm_ops);
 CREATE INDEX index_users_on_api_key ON users(api_key);
+CREATE INDEX index_users_on_company_id ON users(company_id) WHERE company_id IS NOT NULL;
 CREATE INDEX index_users_on_availability_status_when_agent ON users(availability_status) WHERE type = 'agent' AND deleted_at IS NULL;
 CREATE UNIQUE INDEX index_unique_users_on_email_when_type_is_agent
 	ON users(email)
@@ -1073,7 +1101,7 @@ VALUES
 	(
 		'Admin',
 		'Role for users who have complete access to everything.',
-		'{webhooks:manage,context_links:manage,activity_logs:manage,custom_attributes:manage,contacts:read_all,contacts:read,contacts:write,contacts:block,contacts:delete,contacts:export,contact_notes:read,contact_notes:write,contact_notes:delete,conversations:write,ai:manage,help_center:manage,general_settings:manage,notification_settings:manage,oidc:manage,conversations:read_all,conversations:read_unassigned,conversations:read_assigned,conversations:read_team_inbox,conversations:read_team_all,conversations:read,conversations:update_user_assignee,conversations:update_team_assignee,conversations:update_priority,conversations:update_status,conversations:update_tags,messages:read,messages:write,messages:write_private,view:manage,shared_views:manage,status:manage,tags:manage,macros:manage,users:manage,teams:manage,automations:manage,inboxes:manage,roles:manage,reports:manage,templates:manage,business_hours:manage,sla:manage}'
+		'{webhooks:manage,context_links:manage,companies:read,companies:write,companies:delete,activity_logs:manage,custom_attributes:manage,contacts:read_all,contacts:read,contacts:write,contacts:block,contacts:delete,contacts:export,contact_notes:read,contact_notes:write,contact_notes:delete,conversations:write,ai:manage,help_center:manage,general_settings:manage,notification_settings:manage,oidc:manage,conversations:read_all,conversations:read_unassigned,conversations:read_assigned,conversations:read_team_inbox,conversations:read_team_all,conversations:read,conversations:update_user_assignee,conversations:update_team_assignee,conversations:update_priority,conversations:update_status,conversations:update_tags,messages:read,messages:write,messages:write_private,view:manage,shared_views:manage,status:manage,tags:manage,macros:manage,users:manage,teams:manage,automations:manage,inboxes:manage,roles:manage,reports:manage,templates:manage,business_hours:manage,sla:manage}'
 	);
 
 
