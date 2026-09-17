@@ -23,6 +23,7 @@ export const createFormSchema = (t) => z.object({
     phone_number: phoneNumberSchema(t).optional().nullable(),
     phone_number_country_code: z.string().optional().nullable(),
     country: z.string().optional().nullable(),
+    company_id: z.union([z.string(), z.number()]).optional().nullable(),
     avatar_url: z.string().optional().nullable(),
     email: z
         .string({

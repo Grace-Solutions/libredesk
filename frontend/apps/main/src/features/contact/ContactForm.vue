@@ -74,7 +74,20 @@
           </FormItem>
         </FormField>
       </div>
-      <div class="flex-1"></div>
+      <div class="flex-1">
+        <FormField v-slot="{ componentField, handleChange }" name="company_id">
+          <FormItem class="flex flex-col">
+            <FormLabel class="flex items-center">{{ t('globals.terms.company') }}</FormLabel>
+            <FormControl>
+              <SelectCompanyCombobox
+                :model-value="componentField.modelValue"
+                @update:model-value="handleChange"
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        </FormField>
+      </div>
     </div>
 
     <div v-if="userStore.can('contacts:write')">
@@ -97,6 +110,7 @@ import { Input } from '@shared-ui/components/ui/input'
 import { Button } from '@shared-ui/components/ui/button'
 import ComboBox from '@shared-ui/components/ui/combobox/ComboBox.vue'
 import PhoneNumberInput from '@shared-ui/components/PhoneNumberInput.vue'
+import SelectCompanyCombobox from '@main/components/combobox/SelectCompanyCombobox.vue'
 import { countryOptions } from '@shared-ui/constants/countries.js'
 import { useI18n } from 'vue-i18n'
 import { useUserStore } from '@main/stores/user'

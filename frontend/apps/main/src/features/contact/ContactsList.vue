@@ -102,6 +102,13 @@
                 {{ contact.email }}
               </p>
               <div
+                v-if="contact.company_name"
+                class="flex items-center gap-1 text-xs text-muted-foreground"
+              >
+                <Building2 size="12" class="flex-shrink-0" />
+                <span class="truncate">{{ contact.company_name }}</span>
+              </div>
+              <div
                 v-if="contact.external_user_id"
                 class="flex items-center gap-1 text-xs text-muted-foreground"
               >
@@ -139,7 +146,7 @@ import {
 } from '@shared-ui/components/ui/select'
 import { Input } from '@shared-ui/components/ui/input'
 import { Button } from '@shared-ui/components/ui/button'
-import { ArrowDownWideNarrow, IdCardIcon } from 'lucide-vue-next'
+import { ArrowDownWideNarrow, IdCardIcon, Building2 } from 'lucide-vue-next'
 import { Popover, PopoverContent, PopoverTrigger } from '@shared-ui/components/ui/popover'
 import { useDebounceFn } from '@vueuse/core'
 import { EMITTER_EVENTS } from '@main/constants/emitterEvents.js'
