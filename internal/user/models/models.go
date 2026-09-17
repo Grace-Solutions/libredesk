@@ -52,6 +52,8 @@ type UserCompact struct {
 	AvatarURL          null.String `db:"avatar_url" json:"avatar_url"`
 	ExternalUserID     null.String `db:"external_user_id" json:"external_user_id"`
 	AvailabilityStatus string      `db:"availability_status" json:"availability_status"`
+	CompanyID          null.Int    `db:"company_id" json:"company_id"`
+	CompanyName        null.String `db:"company_name" json:"company_name"`
 	CreatedAt          time.Time   `db:"created_at" json:"created_at"`
 	UpdatedAt          time.Time   `db:"updated_at" json:"updated_at"`
 
@@ -80,6 +82,8 @@ type User struct {
 	Meta                   json.RawMessage      `db:"meta" json:"meta"`
 	CustomAttributes       json.RawMessage      `db:"custom_attributes" json:"custom_attributes"`
 	ExternalUserID         null.String          `db:"external_user_id" json:"external_user_id"`
+	CompanyID              null.Int             `db:"company_id" json:"company_id"`
+	CompanyName            null.String          `db:"company_name" json:"company_name"`
 	Teams                  tmodels.TeamsCompact `db:"teams" json:"teams"`
 	ContactChannelID       int                  `db:"contact_channel_id" json:"contact_channel_id,omitempty"`
 	NewPassword            string               `db:"-" json:"new_password,omitempty"`

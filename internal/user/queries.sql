@@ -1,5 +1,6 @@
 -- name: get-users-compact
-SELECT COUNT(*) OVER() as total, users.id, users.avatar_url, users.type, users.created_at, users.updated_at, users.first_name, users.last_name, users.email, users.enabled, users.external_user_id, users.availability_status
+SELECT COUNT(*) OVER() as total, users.id, users.avatar_url, users.type, users.created_at, users.updated_at, users.first_name, users.last_name, users.email, users.enabled, users.external_user_id, users.availability_status,
+    users.company_id, (SELECT name FROM companies WHERE id = users.company_id) AS company_name
 FROM users
 -- email != 'System' also drops NULL-email users (anonymous visitors); AI assistants have no email and must still be listed.
 WHERE (users.email != 'System' OR users.type = 'ai_assistant') AND users.deleted_at IS NULL AND type = ANY($1)
@@ -60,6 +61,8 @@ SELECT
     u.country,
     u.api_key,
     u.api_key_last_used_at,
+    u.company_id,
+    (SELECT name FROM companies WHERE id = u.company_id) AS company_name,
     u.external_user_id,
     u.api_secret,
     array_agg(DISTINCT r.name) FILTER (WHERE r.name IS NOT NULL) AS roles,
@@ -246,8 +249,8 @@ SET enabled = $3, updated_at = NOW()
 WHERE id = $1 AND type = $2;
 
 -- name: insert-contact
-INSERT INTO users (email, type, first_name, last_name, "password", phone_number, phone_number_country_code, country)
-VALUES ($1, 'contact', $2, $3, $4, $5, $6, $7)
+INSERT INTO users (email, type, first_name, last_name, "password", phone_number, phone_number_country_code, country, company_id)
+VALUES ($1, 'contact', $2, $3, $4, $5, $6, $7, $8)
 RETURNING id;
 
 -- name: update-contact
@@ -259,6 +262,7 @@ SET first_name = COALESCE($2, first_name),
     phone_number = $6,
     phone_number_country_code = $7,
     country = $8,
+    company_id = $9,
     updated_at = now()
 WHERE id = $1 and type in ('contact', 'visitor');
 

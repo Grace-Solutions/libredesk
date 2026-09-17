@@ -37,7 +37,7 @@ func (u *Manager) CreateContact(user *models.User) error {
 	} else if envErr, ok := err.(envelope.Error); !ok || envErr.ErrorType != envelope.NotFoundError {
 		return err
 	}
-	if err := u.q.InsertContact.QueryRow(user.Email, user.FirstName, user.LastName, password, user.PhoneNumber, user.PhoneNumberCountryCode, user.Country).Scan(&user.ID); err != nil {
+	if err := u.q.InsertContact.QueryRow(user.Email, user.FirstName, user.LastName, password, user.PhoneNumber, user.PhoneNumberCountryCode, user.Country, user.CompanyID).Scan(&user.ID); err != nil {
 		if dbutil.IsUniqueViolationError(err) {
 			return envelope.NewError(envelope.InputError, u.i18n.T("contact.alreadyExistsWithEmail"), nil)
 		}
@@ -58,7 +58,7 @@ func (u *Manager) UpdateContactBasicInfo(id int, firstName, lastName, email, pho
 
 func (u *Manager) UpdateContact(id int, user models.User) error {
 	user.Email = null.NewString(strings.ToLower(strings.TrimSpace(user.Email.String)), user.Email.Valid)
-	if _, err := u.q.UpdateContact.Exec(id, user.FirstName, user.LastName, user.Email, user.AvatarURL, user.PhoneNumber, user.PhoneNumberCountryCode, user.Country); err != nil {
+	if _, err := u.q.UpdateContact.Exec(id, user.FirstName, user.LastName, user.Email, user.AvatarURL, user.PhoneNumber, user.PhoneNumberCountryCode, user.Country, user.CompanyID); err != nil {
 		if dbutil.IsUniqueViolationError(err) {
 			return envelope.NewError(envelope.InputError, u.i18n.T("contact.alreadyExistsWithEmail"), nil)
 		}

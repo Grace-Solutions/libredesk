@@ -339,6 +339,14 @@ func contactFromForm(r *fastglue.Request) (models.User, *multipart.Form, error) 
 		v := value(key)
 		return null.NewString(v, v != "")
 	}
+	// The edit page clears the company by sending an empty value, which leaves the contact unaffiliated.
+	optionalID := func(key string) null.Int {
+		id, err := strconv.Atoi(value(key))
+		if err != nil || id < 1 {
+			return null.NewInt(0, false)
+		}
+		return null.IntFrom(id)
+	}
 
 	email := value("email")
 	if email == "" {
@@ -360,5 +368,6 @@ func contactFromForm(r *fastglue.Request) (models.User, *multipart.Form, error) 
 		PhoneNumber:            optional("phone_number"),
 		PhoneNumberCountryCode: optional("phone_number_country_code"),
 		Country:                optional("country"),
+		CompanyID:              optionalID("company_id"),
 	}, form, nil
 }
