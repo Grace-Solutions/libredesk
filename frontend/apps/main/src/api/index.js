@@ -223,6 +223,22 @@ const blockContact = (id, data) => http.put(`/api/v1/contacts/${id}/block`, data
 })
 const deleteContact = (id) => http.delete(`/api/v1/contacts/${id}`)
 const exportContact = (id) => http.get(`/api/v1/contacts/${id}/export`, { responseType: 'blob' })
+const getCompanies = (params) => http.get('/api/v1/companies', { params })
+const getCompaniesCompact = (params) => http.get('/api/v1/companies/compact', { params })
+const getCompany = (id) => http.get(`/api/v1/companies/${id}`)
+const createCompany = (data) =>
+  http.post('/api/v1/companies', data, {
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  })
+const updateCompany = (id, data) =>
+  http.put(`/api/v1/companies/${id}`, data, {
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  })
+const deleteCompany = (id) => http.delete(`/api/v1/companies/${id}`)
 const getTeam = (id) => http.get(`/api/v1/teams/${id}`)
 const getTeams = () => http.get('/api/v1/teams')
 const updateTeam = (id, data) => http.put(`/api/v1/teams/${id}`, data, {
@@ -831,6 +847,12 @@ export default {
   blockContact,
   deleteContact,
   exportContact,
+  getCompanies,
+  getCompaniesCompact,
+  getCompany,
+  createCompany,
+  updateCompany,
+  deleteCompany,
   getCustomAttributes,
   createCustomAttribute,
   updateCustomAttribute,
